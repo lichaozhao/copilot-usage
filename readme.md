@@ -39,7 +39,9 @@
 
 1. using you own info to start the proxy server. the info you must provide includes: 
     - allowed_users.txt file, a sample content will be like list of user name:
+      
         user1
+      
         user2
     - config file which includes elastic search info. 
 2. start proxy server using the command provided above. 
