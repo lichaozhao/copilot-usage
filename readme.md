@@ -1,50 +1,61 @@
+# GitHub Copilot for Business Usage Data Collection
 
-# GitHub Copilot for business usage data collection  
+This solution enables the collection of usage data for Copilot for Business clients using mitmproxy. 
+
+- `sample.py` is used as the mitmproxy script. 
+- `copilot-usage.py` is used to collect Copilot usage data. 
+- `copilotchat-usage.py` is used to collect Copilot chat usage data. 
+- `copilot-prompt.py` is used to collect all prompts, including Copilot and chat. 
 
 ## Prerequisites
 
-1. My environment is:
-    - Mitmproxy: 8.0.0
-    - Python:    3.8.10
-    - Platform:  Linux-5.15.0-1050-azure-x86_64-with-glibc2.29
+Ensure the following prerequisites are met:
 
-2. GitHub Copilot proxy setting : [github copilot proxy config](https://docs.github.com/en/copilot/configuring-github-copilot/configuring-network-settings-for-github-copilot?tool=vscode)
+- Mitmproxy version 8.0.0
+- Python version 3.8.10
+- Linux-5.15.0-1050-azure-x86_64-with-glibc2.29 platform
 
-3. Install and config ES on aks, or you can use your existed ES cluster. 
-    - create aks cluster on Azure. 
-    - deploy elasticsearch cluster according to [intall es on AKS](https://www.elastic.co/cn/blog/how-to-run-elastic-cloud-on-kubernetes-from-azure-kubernetes-service) 
+Configure GitHub Copilot proxy settings by referring to the [GitHub Copilot Proxy Config](https://docs.github.com/en/copilot/configuring-github-copilot/configuring-network-settings-for-github-copilot?tool=vscode) documentation.
 
-4. Install mitmproxy on your server and download requisite python libraries. To find more info from [mitmproxy](https://docs.mitmproxy.org/archive/v8/)
+Install and configure Elasticsearch on AKS or use an existing Elasticsearch cluster. To install Elasticsearch on AKS, follow the steps in the [Install Elasticsearch on AKS](https://www.elastic.co/cn/blog/how-to-run-elastic-cloud-on-kubernetes-from-azure-kubernetes-service) guide.
 
-5. Start mitmproxy with correct parameters, choose what you like. 
-    - mitmproxy, mitmdump, mitmweb are 3 different mitmproxy model. 
-    - some examples for start proxy server : 
-        - mitmproxy --listen-host 0.0.0.0 --set block_global=false -s <your script file path> -p <port>
-        - mitmweb --web-host 0.0.0.0 --listen-host 0.0.0.0 --set block_global=false -s <script.py>
+Install mitmproxy on your server and download the required Python libraries. For more information, refer to the [mitmproxy documentation](https://docs.mitmproxy.org/archive/v8/).
 
-          default port of proxy is 8080, default web port is 8081. 
-        - mitmdump --listen-host 0.0.0.0 --set block_global=false -s <your script file path> -p <port>
+## Usage
 
-    - After start proxy server, please config your brsower using proxy and access http://mitm.test to download certificate. 
+Follow these steps to use the solution:
 
-6. Other info 
-    - For VS Code users  
-        - you may need to install win-ca extension to make proxy customized certificate work. 
-        - to collect data, the proxy server address should be: http://<user>@<server_address>:<port>, no password needed. 
-    - For Jerbrains users
-        - you need to allow the option 'accept non-trusted certificates automatically' in settings -> tools -> server certificates 
-        - please fill 'host name', 'port number', chose 'Proxy authentication' and type your user name in 'Login'. No password needed. 
+1. Start mitmproxy with the desired parameters. Choose from the following options:
+     - `mitmproxy`, `mitmdump`, and `mitmweb` are three different models of mitmproxy.
+     - Examples of starting the proxy server:
+         - `mitmproxy --listen-host 0.0.0.0 --set block_global=false -s <your script file path> -p <port>`
+         - `mitmweb --web-host 0.0.0.0 --listen-host 0.0.0.0 --set block_global=false -s <script.py>`
+             (The default port for the proxy is 8080, and the default web port is 8081.)
+         - `mitmdump --listen-host 0.0.0.0 --set block_global=false -s <your script file path> -p <port>`
 
-## How to use it? 
+     - After starting the proxy server, configure your browser to use the proxy and access http://mitm.test to download the certificate.
 
-1. using you own info to start the proxy server. the info you must provide includes: 
-    - allowed_users.txt file, a sample content will be like list of user name:
-      
-        user1
-      
-        user2
-    - config file which includes elastic search info. 
-2. start proxy server using the command provided above. 
-3. run copilot-usage.py, you will get a csv file. then you can do anything you want using spreadsheet.
-        
+2. Additional information:
+     - For VS Code users:
+         - Install the `win-ca` extension to make the customized proxy certificate work.
+         - To collect data, the proxy server address should be: `http://<user>@<server_address>:<port>`, no password is required.
+     - For JetBrains users:
+         - Enable the option 'accept non-trusted certificates automatically' in `Settings -> Tools -> Server Certificates`.
+         - Fill in the 'host name', 'port number', choose 'Proxy authentication', and enter your username in 'Login'. No password is required.
+
+3. Provide your own information to start the proxy server, including:
+     - `allowed_users.txt` file with a list of usernames. For example:
+        ```
+        user1 
+        user2 
+        ...
+        usern
+        ```
+     - Config file containing Elasticsearch information.
+
+4. Start the proxy server using the provided command.
+
+5. Run `copilot-usage.py` or other file to obtain a CSV file. You can then perform any desired actions using a spreadsheet.
+
+## Next Plan ?
 

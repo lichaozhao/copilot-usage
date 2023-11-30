@@ -1,5 +1,7 @@
-# mitmweb --web-host 0.0.0.0 --listen-host 0.0.0.0 --set block_global=false -s <your script path>/sample.py 
-# mitmweb --web-host 0.0.0.0 --listen-host 0.0.0.0 --set block_global=false -s 
+# mitmdump --web-host 0.0.0.0 --listen-host 0.0.0.0 --set block_global=false -s <your script path>/sample.py 
+# mitmweb --web-host 0.0.0.0 --listen-host 0.0.0.0 --set block_global=false 
+# based on Daiel Wang's full feature script. I just simplified it. 
+# the original script also contains whitelist of requests and basic authentication.
 
 import asyncio
 from mitmproxy import http,ctx,connection,proxy
