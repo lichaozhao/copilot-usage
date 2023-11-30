@@ -16,8 +16,46 @@ handler.setFormatter(formatter)
 
 log.addHandler(handler)
 
-# read config and init es client
 
+"""
+Args:
+    start_date (str): The start date in the format "2023-11-01T00:00:00".
+    end_date (str): The end date in the format "2023-11-30T00:00:00".
+    usage_type (str): The type of usage, which can be "copilot", "chat", or "prompt".
+"""
+def get_query(start_date, end_date, usage_type):
+    # map usage_type to keyword
+    usage_type_to_keyword = {
+        "copilot": "telemetry",
+        "chat": "telemetry",
+        "prompt": "completions"
+    }
+    keyword = usage_type_to_keyword.get(usage_type)
+
+    query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "request.url": keyword
+                        }
+                    },
+                    {
+                        "range": {
+                            "timestamp": {
+                                "gte": start_date,
+                                "lte": end_date
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    return query
+
+# read config and init es client
 def es_client():
     config = configparser.ConfigParser()
     config.read('config.ini')
@@ -97,6 +135,4 @@ def es_query(query):
         scroll_size = len(page['hits']['hits'])
         print("scroll size: " + str(scroll_size))
         # Do something with the obtained page
-
-
     return df

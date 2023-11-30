@@ -7,28 +7,7 @@ import importlib
 importlib.reload(ch)
 
 # get prompts, both copilot and chat. 
-query = {
-    "query": {
-        "bool": {
-            "must": [
-                {
-                    "match": {
-                        "request.url": "completions"
-                    }
-                },
-                {
-                    "range": {
-                        "timestamp": {
-                            "gte": "2023-11-01T00:00:00",
-                            "lte": "2023-11-30T23:59:59"
-                        }
-                    }
-                }
-            ]
-        }
-    }
-}
-
+query = ch.get_query("2023-11-01T00:00:00", "2023-11-30T23:59:59", "prompt")
 
 df = ch.es_query(query) 
 content_df = pd.DataFrame() 

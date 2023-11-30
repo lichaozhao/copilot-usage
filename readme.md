@@ -57,5 +57,9 @@ Follow these steps to use the solution:
 
 5. Run `copilot-usage.py` or other file to obtain a CSV file. You can then perform any desired actions using a spreadsheet.
 
+## Known Issues
+
+If you encounter an error message indicating compatibility issues between mitmproxy and Python 3.8, you may need to reinstall certain packages with specific versions as prompted. 
+
 ## Next Plan ?
 

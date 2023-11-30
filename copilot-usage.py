@@ -12,27 +12,7 @@ importlib.reload(ch)
 # https://copilot-proxy.githubusercontent.com/v1/engines/copilot-codex/completions
 # https://copilot-telemetry.githubusercontent.com/telemetry 
 
-query = {
-    "query": {
-        "bool": {
-            "must": [
-                {
-                    "match": {
-                        "request.url": "telemetry"
-                    }
-                },
-                {
-                    "range": {
-                        "timestamp": {
-                            "gte": "2023-11-01T00:00:00",
-                            "lte": "2023-11-30T23:59:59"
-                        }
-                    }
-                }
-            ]
-        }
-    }
-}
+query = ch.get_query("2023-11-01T00:00:00", "2023-11-30T23:59:59", "copilot")
 
 
 df = ch.es_query(query)
@@ -100,7 +80,7 @@ content_df.to_csv('contents.csv', index=False)  # Write the DataFrame to a CSV f
 
 content_df['time'] = pd.to_datetime(content_df['time'])
 
-# 使用groupby()函数和agg()函数统计每个用户的登录次数和最新一次登录的时间
+# get latest login time for each user
 user_stats = content_df.groupby('user').agg(
     login_count=('time', 'count'),
     latest_login=('time', 'max')
