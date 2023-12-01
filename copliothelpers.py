@@ -5,6 +5,9 @@ from elasticsearch import Elasticsearch
 from elasticsearch import helpers 
 import configparser 
 import logging
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from azure.core.exceptions import ResourceExistsError
+import io
 
 # logging config 
 log = logging.getLogger(__name__)
@@ -24,6 +27,11 @@ Args:
     usage_type (str): The type of usage, which can be "copilot", "chat", or "prompt".
 """
 def get_query(start_date, end_date, usage_type):
+    # Define the search query, chat has different url to call 
+    # https://copilot-proxy.githubusercontent.com/v1/engines/copilot-codex/completions
+    # https://api.githubcopilot.com/chat/completions
+    # https://copilot-telemetry.githubusercontent.com/telemetry 
+
     # map usage_type to keyword
     usage_type_to_keyword = {
         "copilot": "telemetry",
@@ -114,7 +122,7 @@ def es_query(query):
         index='mitmproxy',
         body=query,
         scroll='2m',  # length of time to keep the scroll window open
-        size=10  # number of results (documents) to return per batch
+        size=1000  # number of results (documents) to return per batch
     )
 
     # the reults for the query 
@@ -136,3 +144,49 @@ def es_query(query):
         print("scroll size: " + str(scroll_size))
         # Do something with the obtained page
     return df
+
+
+async def write_df_to_azure_blob(df, start_date, end_date, data_type):
+    # config.ini 
+    # [blob]
+    # endpoint=https://<storage_account_name>.blob.core.windows.net
+    # access_token=<access key>
+    # container_name=<container_name>
+
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    endpoint = config.get('blob', 'endpoint') 
+    access_token = config.get('blob', 'access_token')
+    container_name = config.get('blob', 'container_name') 
+ 
+ 
+    # Create a unique name for the blob
+    blob_name = f"{data_type}_{start_date}_{end_date}.csv"
+    
+    # Convert DataFrame to CSV format
+    output = io.StringIO()
+    df.to_csv(output, index=False)
+    csv_data = output.getvalue()
+    
+    try:
+        # Create a BlobServiceClient object
+        blob_service_client = BlobServiceClient(account_url=endpoint, credential=access_token)
+        
+        # Get a ContainerClient object
+        container_client = blob_service_client.get_container_client(container_name)
+        
+        # Get a BlobClient object
+        blob_client = container_client.get_blob_client(blob_name)
+        
+        # Check if the blob exists
+        
+        if blob_client.exists():
+            print(f"The blob {blob_name} already exists. It will be overwritten.")
+        
+        # Upload the data
+        blob_client.upload_blob(csv_data, overwrite=True)
+    except Exception as ex:
+        print(f"An unexpected error occurred: {ex}")
+
+    

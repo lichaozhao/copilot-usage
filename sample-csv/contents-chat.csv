@@ -1,0 +1,15 @@
+time,eventname,ide,extname,extversion,user
+2023-11-30T08:34:43.814Z,copilot-chat/conversation.suggestionShown,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:34:43.814Z,copilot-chat/conversation.suggestionShown,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:34:43.814Z,copilot-chat/conversation.suggestionShown,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:35:21.100Z,copilot-chat/conversation.suggestionShown,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:35:24.507Z,copilot-chat/conversation.acceptedCopy,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:35:24.509Z,copilot-chat/conversation.acceptedCopy,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:35:26.426Z,copilot-chat/conversation.acceptedInsert,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:35:26.427Z,copilot-chat/conversation.acceptedInsert,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:35:32.696Z,copilot-chat/conversation.acceptedInsert,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T08:35:32.697Z,copilot-chat/conversation.acceptedInsert,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T13:00:09.696Z,copilot-chat/conversation.suggestionShown,vscode/1.84.2,copilot-chat,0.10.2,testuser1
+2023-11-30T13:02:28.737Z,agent/conversation.suggestionShown,JetBrains-PY/232.10203.26,copilot-intellij,1.4.0.3748,testuser1
+2023-11-30T13:02:54.839Z,agent/conversation.acceptedCopy,JetBrains-PY/232.10203.26,copilot-intellij,1.4.0.3748,testuser1
+2023-11-30T13:02:58.387Z,agent/conversation.acceptedInsert,JetBrains-PY/232.10203.26,copilot-intellij,1.4.0.3748,testuser1

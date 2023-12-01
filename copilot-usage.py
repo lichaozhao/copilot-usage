@@ -5,15 +5,12 @@ from elasticsearch import Elasticsearch
 from elasticsearch import helpers 
 import copliothelpers as ch
 import importlib 
+import asyncio
+
 
 importlib.reload(ch)
 
-# Define the search query
-# https://copilot-proxy.githubusercontent.com/v1/engines/copilot-codex/completions
-# https://copilot-telemetry.githubusercontent.com/telemetry 
-
 query = ch.get_query("2023-11-01T00:00:00", "2023-11-30T23:59:59", "copilot")
-
 
 df = ch.es_query(query)
 # dataframe which combines each request.content which gets more that one line. 
@@ -40,11 +37,7 @@ for index, row in df.iterrows():
         # the raw data may have some escape characters, so need to remove them
         # line = line.replace('\\\\', '').replace('"{', '{').replace('}"', '}').replace('"[[', '{').replace(']]"', '}').replace(',[]', ':[]')
         # line = line.replace('\\"','').replace('\\','')
-
         # only get the event which we are interested in
-            # 'copilot-chat/conversation.suggestionShown',
-            # 'copilot-chat/conversation.acceptedInsert',
-            # 'copilot-chat/conversation.acceptedCopy',
         event_strs = [
             'copilot/ghostText.shown',
             'copilot/ghostText.accepted',
@@ -72,19 +65,9 @@ for index, row in df.iterrows():
         content_df = content_df._append(tmp, ignore_index=True)
         content_df['user'] = row['user'] 
 
+# save to local
+# content_df.to_csv('copilot-usage.csv', index=False)
 
-content_df.to_csv('contents.csv', index=False)  # Write the DataFrame to a CSV file
-
-
-# do some analysis based on the content_df 
-
-content_df['time'] = pd.to_datetime(content_df['time'])
-
-# get latest login time for each user
-user_stats = content_df.groupby('user').agg(
-    login_count=('time', 'count'),
-    latest_login=('time', 'max')
-)
-
-print(user_stats)
+# save to azure blob
+asyncio.run(ch.write_df_to_azure_blob(content_df, "2023-11-01T00:00:00", "2023-11-30T23:59:59", "copilot"))
 

@@ -9,12 +9,7 @@ import importlib
 
 importlib.reload(ch)
 
-# Define the search query, chat has different url to call 
-# https://copilot-proxy.githubusercontent.com/v1/engines/copilot-codex/completions
-# https://copilot-telemetry.githubusercontent.com/telemetry 
-
 query = ch.get_query("2023-11-01T00:00:00", "2023-11-30T23:59:59", "chat")
-
 
 df = ch.es_query(query)
 # dataframe which combines each request.content which gets more that one line. 
