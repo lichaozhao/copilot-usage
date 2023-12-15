@@ -33,7 +33,7 @@ Follow these steps to use the solution:
              (The default port for the proxy is 8080, and the default web port is 8081.)
          - `mitmdump --listen-host 0.0.0.0 --set block_global=false -s <your script file path> -p <port>`
 
-     - After starting the proxy server, configure your browser to use the proxy and access http://mitm.test to download the certificate.
+     - After starting the proxy server, configure your browser to use the proxy and access http://mitm.it to download the certificate.
 
 2. Additional information:
      - For VS Code users:
