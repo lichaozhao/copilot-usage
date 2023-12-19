@@ -10,7 +10,7 @@ import asyncio
 
 importlib.reload(ch)
 
-query = ch.get_query("2023-11-01T00:00:00", "2023-11-30T23:59:59", "copilot")
+query = ch.get_query("2023-11-01T00:00:00", "2023-12-30T23:59:59", "copilot")
 
 df = ch.es_query(query)
 # dataframe which combines each request.content which gets more that one line. 
@@ -62,12 +62,14 @@ for index, row in df.iterrows():
             'data.baseData.properties.common_extversion': 'extversion'
             }
         )
+
+        tmp['user'] = row['user']
         content_df = content_df._append(tmp, ignore_index=True)
-        content_df['user'] = row['user'] 
+
 
 # save to local
-# content_df.to_csv('copilot-usage.csv', index=False)
+content_df.to_csv('copilot-usage.csv', index=False)
 
 # save to azure blob
-asyncio.run(ch.write_df_to_azure_blob(content_df, "2023-11-01T00:00:00", "2023-11-30T23:59:59", "copilot"))
+# asyncio.run(ch.write_df_to_azure_blob(content_df, "2023-11-01T00:00:00", "2023-11-30T23:59:59", "copilot"))
 

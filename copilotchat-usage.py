@@ -62,8 +62,9 @@ for index, row in df.iterrows():
             'data.baseData.properties.common_extversion': 'extversion'
             }
         )
+
+        tmp['user'] = row['user']
         content_df = content_df._append(tmp, ignore_index=True)
-        content_df['user'] = row['user'] 
 
 
 content_df.to_csv('contents-chat.csv', index=False)  # Write the DataFrame to a CSV file
