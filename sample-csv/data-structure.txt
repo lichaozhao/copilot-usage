@@ -1,0 +1,69 @@
+data.baseData.properties
+    - some client env info, such as languages, ide version etc. 
+    - list:
+        languageId
+        common_vscodeversion
+        common_extname
+        common_extversion
+data.baseData.measurements
+    - diffrenent contenct with different baseData.name 
+    - list:
+        measurements.numLines
+data.time 
+
+data.baseData.name :
+    - the valuable name contians
+        - copilot/ghostText.shown
+        - copilot/ghostText.accepted
+        - copilot-chat/conversation.suggestionShown
+        - copilot-chat/conversation.acceptedInsert
+        - copilot-chat/conversation.acceptedCopy
+        - agent/ghostText.accepted
+        - agent/ghostText.shown
+    
+
+Copilot data :
+
+in VS Code 
+0      copilot/ghostText.docVersionMismatch
+1                       copilot/prompt.stat
+3                  copilot/ghostText.issued
+4                      copilot/request.sent
+5          copilot/networking.cancelRequest
+8                copilot/ghostText.canceled
+10                 copilot/request.response
+11          copilot/completion.finishReason
+12            copilot/ghostText.performance
+13               copilot/ghostText.produced
+14                  copilot/ghostText.shown
+174              copilot/ghostText.accepted
+177                 copilot/ghostText.empty
+178    copilot/completion.alreadyInDocument
+200           copilot/ghostText.stillInCode
+
+
+in JetBrains
+0               agent/ghostText.accepted
+1         agent/networking.cancelRequest
+2                      agent/prompt.stat
+3                 agent/ghostText.issued
+4               agent/ghostText.produced
+5     agent/completion.alreadyInDocument
+8                     agent/request.sent
+9                 agent/request.response
+10         agent/completion.finishReason
+11           agent/ghostText.performance
+15                 agent/ghostText.shown
+29                 agent/ghostText.empty
+
+
+Copilot Chat data :
+
+
+0     copilot-chat/conversation.suggestionShown
+3                     copilot-chat/request.sent
+4                 copilot-chat/request.response
+5          copilot-chat/completion.finishReason
+7        copilot-chat/conversation.acceptedCopy
+17            copilot-chat/conversation.message
+40     copilot-chat/conversation.acceptedInsert
