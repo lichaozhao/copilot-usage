@@ -12,14 +12,38 @@ This solution enables the collection of usage data for Copilot for Business clie
 Ensure the following prerequisites are met:
 
 - Mitmproxy version 8.0.0
-- Python version 3.8.10
+- Python version 3.8.10+
 - Linux-5.15.0-1050-azure-x86_64-with-glibc2.29 platform
+- Required Python packages (install with `pip install -r requirements.txt`)
 
 Configure GitHub Copilot proxy settings by referring to the [GitHub Copilot Proxy Config](https://docs.github.com/en/copilot/configuring-github-copilot/configuring-network-settings-for-github-copilot?tool=vscode) documentation.
 
 Install and configure Elasticsearch on AKS or use an existing Elasticsearch cluster. To install Elasticsearch on AKS, follow the steps in the [Install Elasticsearch on AKS](https://www.elastic.co/cn/blog/how-to-run-elastic-cloud-on-kubernetes-from-azure-kubernetes-service) guide.
 
 Install mitmproxy on your server and download the required Python libraries. For more information, refer to the [mitmproxy documentation](https://docs.mitmproxy.org/archive/v8/).
+
+### Azure Active Directory (AAD) Integration
+
+This solution now supports Azure Active Directory authentication for enhanced security:
+
+1. **Create an Azure AD App Registration:**
+   - Register a new application in Azure AD
+   - Note the `Client ID`, `Client Secret`, and `Tenant ID`
+   - Configure appropriate API permissions if needed
+
+2. **Configure AAD in config.ini:**
+   ```ini
+   [aad]
+   tenant_id=your-tenant-id
+   client_id=your-client-id
+   client_secret=your-client-secret
+   enable_aad_auth=true
+   fallback_to_userlist=true
+   ```
+
+3. **Authentication Methods:**
+   - **Bearer Token (Recommended)**: Use `Authorization: Bearer <jwt-token>` header
+   - **Legacy Basic Auth**: Use `Proxy-Authorization: Basic <base64-credentials>` header
 
 ## Usage
 
@@ -51,11 +75,17 @@ Follow these steps to use the solution:
         ...
         usern
         ```
-     - Config file containing Elasticsearch information.
+     - Config file containing Elasticsearch information and AAD settings (copy from `config-sample.ini`)
+     - For AAD authentication, configure your Azure AD app registration details
 
-4. Start the proxy server using the provided command.
+4. **Authentication Setup:**
+   - **With AAD**: Set `enable_aad_auth=true` in config.ini and provide AAD credentials via Bearer token
+   - **Legacy Mode**: Keep `enable_aad_auth=false` and use the traditional username list with basic auth
+   - **Hybrid Mode**: Enable both AAD and fallback to userlist for backward compatibility
 
-5. Run `copilot-usage.py` or other file to obtain a CSV file. You can then perform any desired actions using a spreadsheet.
+5. Start the proxy server using the provided command.
+
+6. Run `copilot-usage.py` or other file to obtain a CSV file. You can then perform any desired actions using a spreadsheet.
 
 ## Known Issues
 

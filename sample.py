@@ -2,6 +2,7 @@
 # mitmweb --web-host 0.0.0.0 --listen-host 0.0.0.0 --set block_global=false 
 # based on Daiel Wang's full feature script. I just simplified it. 
 # the original script also contains whitelist of requests and basic authentication.
+# Enhanced with Azure Active Directory (AAD) integration
 
 import asyncio
 from mitmproxy import http,ctx,connection,proxy
@@ -12,6 +13,7 @@ import re
 import os
 import functools 
 import configparser
+from aad_auth import AADAuthenticator
 
 # read es config info from config.ini and init es client
 # format: 
@@ -39,6 +41,8 @@ class SaveLogtoElasticSearch:
         self.proxy_authorizations = {} 
         # allowed_users.txt only contains a list of username 
         self.user_list = self.load_users("<path>/allowed_users.txt")
+        # Initialize AAD authenticator
+        self.aad_auth = AADAuthenticator("<path>/config.ini")
     
     def load_users(self, file_path):
         if not os.path.exists(file_path):
@@ -51,24 +55,31 @@ class SaveLogtoElasticSearch:
 
     # verify whether the request is allowed 
     def http_connect(self, flow: http.HTTPFlow):
-        # get proxy-authorization http://username@proxy_address:port
+        # Enhanced authentication: support both AAD and legacy proxy auth
+        
+        # Try Authorization header first (Bearer token for AAD)
+        auth_header = flow.request.headers.get("Authorization", "")
+        if auth_header:
+            username = self.aad_auth.authenticate_user(auth_header)
+            if username:
+                ctx.log.info(f"Authenticated User via AAD: {username}@{flow.client_conn.address[0]}")
+                self.proxy_authorizations[flow.client_conn.address[0]] = username
+                return
+        
+        # Fallback to legacy Proxy-Authorization for backward compatibility
         proxy_auth = flow.request.headers.get("Proxy-Authorization", "")
-
+        if proxy_auth:
+            username = self.aad_auth.authenticate_user(proxy_auth)
+            if username and (username in self.user_list or not self.aad_auth.fallback_to_userlist):
+                ctx.log.info(f"Authenticated User via Proxy-Auth: {username}@{flow.client_conn.address[0]}")
+                self.proxy_authorizations[flow.client_conn.address[0]] = username
+                return
         
-        # verify username whether exist and be in user_list
-        if not proxy_auth:
-            flow.response = http.Response.make(401)
-            return
-
-        auth_type, auth_string = proxy_auth.split(" ", 1)
-        username = base64.b64decode(auth_string).decode("utf-8").replace(":", "")
-        
-        if not (username in self.user_list):
-            flow.response = http.Response.make(401)
-            return
-        
-        ctx.log.info("Authenticated User: " + username + "@" + flow.client_conn.address[0])
-        self.proxy_authorizations[(flow.client_conn.address[0])] = username
+        # No valid authentication found
+        ctx.log.warning(f"Authentication failed for {flow.client_conn.address[0]}")
+        flow.response = http.Response.make(401, b"Authentication required", {
+            "WWW-Authenticate": "Bearer realm=\"Copilot Usage Collection\", Basic realm=\"Legacy Auth\""
+        })
 
 
     def response(self, flow: http.HTTPFlow):
@@ -81,6 +92,9 @@ class SaveLogtoElasticSearch:
             return
 
         username = self.proxy_authorizations.get(flow.client_conn.address[0])
+        
+        # Get additional user information from AAD if available
+        user_info = self.aad_auth.get_user_info(username) if username else {}
 
         # Add "ms" to the end of the timeconsumed string
         timeconsumed = round((flow.response.timestamp_end - flow.request.timestamp_start) * 1000, 2)
@@ -89,6 +103,7 @@ class SaveLogtoElasticSearch:
         # save to es
         doc = {
             'user': username,
+            'user_info': user_info,  # Additional AAD user information
             "timestamp": datetime.utcnow().isoformat(),
             "proxy-time-consumed": timeconsumed_str,  # Use the modified timeconsumed string
             'request': {
